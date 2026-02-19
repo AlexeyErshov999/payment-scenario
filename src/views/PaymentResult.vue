@@ -2,5 +2,5 @@
 </script>
 
 <template>
-  <h1>Order</h1>
+  <h1>Payment Result</h1>
 </template>
