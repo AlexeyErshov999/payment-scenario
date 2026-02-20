@@ -3,7 +3,6 @@ import { useRouter } from 'vue-router'
 
 interface Props {
   text: string
-  type?: 'button' | 'submit' | 'reset'
   loading?: boolean
   disabled?: boolean
   redirectTo?: string
@@ -11,9 +10,8 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   text: '',
-  type: 'button',
   loading: false,
-  disabled: true,
+  disabled: false,
   redirectTo: '',
 })
 
@@ -39,10 +37,10 @@ const handleClick = async (event: MouseEvent) => {
 </script>
 
 <template>
-  <button 
-    class="submit-button" 
+  <button
+    class="submit-button"
     :class="{ 'is-loading': loading }"
-    :disabled="disabled || loading" 
+    :disabled="disabled"
     @click="handleClick"
   >
     <span v-if="loading" class="spinner" />
@@ -52,24 +50,22 @@ const handleClick = async (event: MouseEvent) => {
 
 <style lang="scss" scoped>
 @import '@/styles/variables/index.scss';
-@import '@/styles/mixins/responsive';
+@import '@/styles/mixins/responsive.scss';
 
 .submit-button {
   display: flex;
   justify-content: center;
   align-items: center;
-  inline-size: 100%;
-  height: 50px;
   background-color: $accent-color;
   border-radius: $border-radius-l;
   color: $white;
-  max-inline-size: 50rem;
   border: none;
-  cursor: pointer;
   font-size: 1rem;
   font-weight: 500;
   position: relative;
-  
+  padding-inline: $padding-h-submit-button;
+  padding-block: $padding-v-submit-button;
+
   transition: all 0.3s ease;
 
   &:hover:not(:disabled):not(.is-loading) {
@@ -90,18 +86,16 @@ const handleClick = async (event: MouseEvent) => {
   &:disabled {
     background-color: $gray-medium;
     cursor: not-allowed;
-    opacity: 0.6;
-    
+
     &:hover {
       box-shadow: none;
     }
   }
-  
+
   &.is-loading {
     background-color: $accent-color;
     cursor: wait;
-    opacity: 0.8;
-    
+
     &:hover {
       background-color: $accent-color;
       box-shadow: none;
@@ -118,12 +112,6 @@ const handleClick = async (event: MouseEvent) => {
   border-top-color: #fff;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
-}
-
-.visually-hidden {
-  opacity: 0;
-  width: 0;
-  margin: 0;
 }
 
 @keyframes spin {
