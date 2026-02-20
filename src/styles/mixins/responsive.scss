@@ -4,28 +4,32 @@ $breakpoint-lg: 1024px;
 $breakpoint-xl: 1280px;
 $breakpoint-2xl: 1536px;
 
-@mixin mobile {
+@mixin mobile-only {
   @media (max-width: #{$breakpoint-sm}) {
     @content;
   }
 }
 
-@mixin tablet {
+@mixin tablet-only {
   @media (min-width: #{$breakpoint-md}) and (max-width: #{$breakpoint-lg}) {
     @content;
   }
 }
 
-@mixin desktop {
-  @media (min-width: #{$breakpoint-lg}) {
+@mixin desktop-only {
+  @media (min-width: #{$breakpoint-lg}) and (max-width: #{$breakpoint-xl}) {
     @content;
   }
 }
 
-@mixin hover {
-  @media (hover: hover) {
-    &:hover {
-      @content;
-    }
+@mixin desktop-wide {
+  @media (min-width: #{$breakpoint-xl}) and (max-width: #{$breakpoint-2xl}) {
+    @content;
+  }
+}
+
+@mixin desktop-ultrawide {
+  @media (min-width: #{$breakpoint-2xl}) {
+    @content;
   }
 }
