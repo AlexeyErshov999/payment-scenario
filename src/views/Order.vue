@@ -21,6 +21,13 @@ import FormInput from '../components/ui/FormInput.vue'
         placeholder="Введите email"
         error="Ошибка валидации"
       />
+      <FormInput
+        label="Описание"
+        type="text"
+        placeholder="Введите описание"
+        :max-lines="3"
+        error="Ошибка валидации"
+      />
       <SubmitButton text="12 000" />
     </FormCard>
   </PageContainer>
