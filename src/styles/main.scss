@@ -1,3 +1,10 @@
-@use 'reset';
-@use 'variables/index';
-@use 'mixins/responsive';
+@import 'reset.scss';
+@import 'variables/index.scss';
+@import 'mixins/responsive.scss';
+
+// базовые классы
+.visually-hidden {
+  opacity: 0;
+  width: 0;
+  margin: 0;
+}
