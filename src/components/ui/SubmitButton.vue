@@ -109,7 +109,7 @@ const handleClick = async (event: MouseEvent) => {
   height: 16px;
   margin-right: 8px;
   border: 2px solid rgba(255, 255, 255, 0.3);
-  border-top-color: #fff;
+  border-top-color: $white;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
