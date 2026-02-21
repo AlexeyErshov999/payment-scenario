@@ -24,20 +24,5 @@ defineProps<{
   font-size: 12px;
   line-height: 13px;
   letter-spacing: 0.3px;
-
-  margin-block-start: calc(var(--card-padding-block, 1rem) * 0.25);
-
-  @include mobile-only {
-    font-size: 11px;
-    line-height: 12px;
-    letter-spacing: 0.2px;
-    margin-block-start: calc(var(--card-padding-block, 1rem) * 0.2);
-  }
-
-  @media (min-width: #{$breakpoint-2xl}) {
-    font-size: 13px;
-    line-height: 14px;
-    letter-spacing: 0.3px;
-  }
 }
 </style>
