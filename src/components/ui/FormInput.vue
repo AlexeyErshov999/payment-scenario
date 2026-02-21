@@ -110,7 +110,7 @@ watch(() => props.maxLines, () => {
   color: $gray-medium;
   font-size: 12px;
   line-height: 13px;
-  font-weight: 500;
+  font-weight: 400;
 }
 
 .input-container {
@@ -127,6 +127,7 @@ watch(() => props.maxLines, () => {
   color: $gray-dark;
   border: none;
   border-bottom: 1px solid $gray-light;
+  margin-bottom: 4px;
   outline: none;
   transition: border-color 0.2s ease;
   background: transparent;
