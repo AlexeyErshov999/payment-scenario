@@ -1,6 +1,17 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
+import { useOrderStore } from '../stores/orderStore'
+import { useValidationErrorsStore } from '../stores/validationErrorsStore'
 
-const routes = [
+declare module 'vue-router' {
+  interface RouteMeta {
+    title?: string
+    requiresOrderData?: boolean
+    requiresPayment?: boolean
+    requiresStep?: 'order' | 'payment' | 'success'
+  }
+}
+
+const routes: RouteRecordRaw[] = [
   {
     path: '/',
     redirect: '/order',
@@ -17,11 +28,10 @@ const routes = [
   {
     path: '/payment',
     name: 'payment',
-    component: () => import('@/views/Payment.vue'),
+    component: () => import('../../src/views/OrderPayment.vue'),
     meta: {
       title: 'Оплата заказа',
       requiresOrderData: true,
-      requiresStep: 'order',
     },
   },
   {
@@ -32,11 +42,11 @@ const routes = [
       title: 'Заказ оформлен',
       requiresOrderData: true,
       requiresPayment: true,
-      requiresStep: 'payment',
     },
   },
   {
     path: '/:pathMatch(.*)*',
+    name: 'not-found',
     redirect: '/order',
   },
 ]
@@ -44,6 +54,40 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(),
   routes,
+})
+
+router.beforeEach(async (to, from, next) => {
+  if (to.meta.title) {
+    document.title = to.meta.title
+  }
+
+  const orderStore = useOrderStore()
+  const validationStore = useValidationErrorsStore()
+
+  validationStore.clearAllErrors()
+
+  if (orderStore.loading) {
+    await new Promise(resolve => setTimeout(resolve, 100))
+  }
+
+  if (to.meta.requiresOrderData && !orderStore.hasOrderData) {
+    console.log('No order data, redirecting to /order')
+    next('/order')
+    return
+  }
+
+  if (to.meta.requiresPayment) {
+    // TODO: подумать про оплату
+    const paymentCompleted = false
+
+    if (!paymentCompleted) {
+      console.log('Payment required, redirecting to /payment')
+      next('/payment')
+      return
+    }
+  }
+
+  next()
 })
 
 export default router

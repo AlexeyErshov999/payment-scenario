@@ -1,36 +1,77 @@
-import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
+import { ref, computed } from 'vue'
 
 export const useValidationErrorsStore = defineStore('validationErrors', () => {
-  const errors = ref<Record<string, string>>({})
+  const errors = ref<Record<string, string[]>>({})
 
-  const getError = computed(() => (fieldName: string) => {
-    return errors.value[fieldName] || ''
+  const hasErrors = computed<boolean>(() => {
+    return Object.values(errors.value).some(fieldErrors => fieldErrors.length > 0)
   })
 
-  const setError = (fieldName: string, errorMessage: string) => {
-    errors.value[fieldName] = errorMessage
+  const allErrors = computed<Record<string, string[]>>(() => errors.value || {})
+
+  const errorsCount = computed<number>(() => {
+    return Object.values(errors.value).reduce((count, fieldErrors) => count + fieldErrors.length, 0)
+  })
+
+  const errorsList = computed<string[]>(() => {
+    return Object.values(errors.value).flat()
+  })
+
+  function addError(field: string, error: string): void {
+    if (!errors.value[field]) {
+      errors.value[field] = []
+    }
+    if (!errors.value[field].includes(error)) {
+      errors.value[field].push(error)
+    }
   }
 
-  const clearError = (fieldName: string) => {
-    delete errors.value[fieldName]
+  function getFieldErrors(field: string): string[] {
+    return errors.value[field] || []
   }
 
-  const clearAllErrors = () => {
+  function getFirstError(field: string): string | undefined {
+    return errors.value[field]?.[0]
+  }
+
+  function clearFieldErrors(field: string): void {
+    if (errors.value[field]) {
+      errors.value[field] = []
+    }
+  }
+
+  function clearAllErrors(): void {
     errors.value = {}
   }
 
-  const hasErrors = computed(() => Object.keys(errors.value).length > 0)
+  function removeError(field: string, error: string): void {
+    if (errors.value[field]) {
+      errors.value[field] = errors.value[field].filter(e => e !== error)
+      if (errors.value[field].length === 0) {
+        delete errors.value[field]
+      }
+    }
+  }
 
-  const allErrors = computed(() => errors.value)
+  function hasFieldErrors(field: string): boolean {
+    return !!(errors.value[field] && errors.value[field].length > 0)
+  }
 
   return {
     errors,
-    getError,
-    setError,
-    clearError,
-    clearAllErrors,
+
     hasErrors,
     allErrors,
+    errorsCount,
+    errorsList,
+
+    addError,
+    getFieldErrors,
+    getFirstError,
+    clearFieldErrors,
+    clearAllErrors,
+    removeError,
+    hasFieldErrors
   }
 })

@@ -46,40 +46,48 @@ interface IFormInputProps {
   error?: string
   maxLines?: number
   rules?: Array<(value: string) => string | boolean>
+  modelValue?: string | number
 }
 
 const props = defineProps<IFormInputProps>()
 
-const text = ref('')
+const emit = defineEmits<{
+  (e: 'update:modelValue', value: string): void
+}>()
+
+const text = ref(props.modelValue?.toString() || '')
 const textareaRef = ref<HTMLTextAreaElement | null>(null)
 
 const validationStore = useValidationErrorsStore()
 
 const localError = computed(() => {
   if (props.error) return props.error
-  return validationStore.getError(props.name)
+  const fieldErrors = validationStore.allErrors[props.name]
+  return fieldErrors && fieldErrors.length > 0 ? fieldErrors[0] : undefined
 })
 
 const inputValue = computed({
   get: () => text.value,
   set: (value) => {
     text.value = value
-    if (localError.value) {
-      validationStore.clearError(props.name)
+    emit('update:modelValue', value)
+    if ((validationStore.allErrors[props.name] || []).length > 0) {
+      validationStore.clearFieldErrors(props.name)
     }
   }
 })
 
 const validateField = () => {
+  validationStore.clearFieldErrors(props.name)
+
   if (props.rules && props.rules.length > 0) {
     for (const rule of props.rules) {
       const result = rule(text.value)
       if (typeof result === 'string') {
-        validationStore.setError(props.name, result)
+        validationStore.addError(props.name, result)
         return
       }
     }
-    validationStore.clearError(props.name)
   } else {
     let errorMessage = ''
 
@@ -88,9 +96,7 @@ const validateField = () => {
     }
 
     if (errorMessage) {
-      validationStore.setError(props.name, errorMessage)
-    } else {
-      validationStore.clearError(props.name)
+      validationStore.addError(props.name, errorMessage)
     }
   }
 }
@@ -121,6 +127,12 @@ const autoResize = () => {
   }
 }
 
+watch(() => props.modelValue, (newVal) => {
+  if (newVal !== undefined) {
+    text.value = newVal.toString()
+  }
+})
+
 watch(text, () => {
   if (props.maxLines && props.maxLines > 1) {
     nextTick(() => {
@@ -138,7 +150,7 @@ watch(() => props.maxLines, () => {
 }, { immediate: true })
 
 onUnmounted(() => {
-  validationStore.clearError(props.name)
+  validationStore.clearFieldErrors(props.name)
 })
 </script>
 

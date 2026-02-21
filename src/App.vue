@@ -1,7 +1,5 @@
-<script setup lang="ts">
-import Order from './views/OrderForm.vue';
-</script>
-
 <template>
-  <Order />
+  <div id="app">
+    <router-view />
+  </div>
 </template>
