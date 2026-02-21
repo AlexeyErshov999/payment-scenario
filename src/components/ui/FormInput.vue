@@ -2,45 +2,50 @@
   <div class="input-wrapper">
     <label class="input__label">{{ label }}</label>
     <div class="input-container" :class="{ 'has-icon': icon }">
-      <!-- Используем textarea для многострочного ввода -->
       <textarea
         v-if="maxLines && maxLines > 1"
         class="input textarea"
-        v-model="text"
+        :class="{ 'input--error': localError }"
+        v-model="inputValue"
         :placeholder="placeholder"
         :rows="maxLines"
         :style="{ paddingRight: icon ? '30px' : '12px' }"
         @input="autoResize"
+        @blur="validateField"
         ref="textareaRef"
       ></textarea>
 
-      <!-- Обычный input для одной строки -->
       <input
         v-else
         class="input"
+        :class="{ 'input--error': localError }"
         :type="type"
-        v-model="text"
+        v-model="inputValue"
         :placeholder="placeholder"
         :style="{ paddingRight: icon ? '30px' : '12px' }"
+        @blur="validateField"
       />
 
       <span v-if="icon" class="input__icon" v-html="icon"></span>
     </div>
-    <ErrorMessage v-if="error" :text="error" />
+    <ErrorMessage v-if="localError" :text="localError" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, watch, nextTick } from 'vue'
+import { ref, watch, nextTick, computed, onUnmounted } from 'vue'
 import ErrorMessage from './ErrorMessage.vue'
+import { useValidationErrorsStore } from '../../stores/validationErrorsStore'
 
 interface IFormInputProps {
+  name: string
   label: string
   type?: 'text' | 'email' | 'password' | 'tel' | 'number'
   placeholder?: string
   icon?: string
   error?: string
-  maxLines?: number // 1, 2 или 3 строки максимум
+  maxLines?: number
+  rules?: Array<(value: string) => string | boolean>
 }
 
 const props = defineProps<IFormInputProps>()
@@ -48,26 +53,66 @@ const props = defineProps<IFormInputProps>()
 const text = ref('')
 const textareaRef = ref<HTMLTextAreaElement | null>(null)
 
-// Функция для авто-изменения высоты textarea
+const validationStore = useValidationErrorsStore()
+
+const localError = computed(() => {
+  if (props.error) return props.error
+  return validationStore.getError(props.name)
+})
+
+const inputValue = computed({
+  get: () => text.value,
+  set: (value) => {
+    text.value = value
+    if (localError.value) {
+      validationStore.clearError(props.name)
+    }
+  }
+})
+
+const validateField = () => {
+  if (props.rules && props.rules.length > 0) {
+    for (const rule of props.rules) {
+      const result = rule(text.value)
+      if (typeof result === 'string') {
+        validationStore.setError(props.name, result)
+        return
+      }
+    }
+    validationStore.clearError(props.name)
+  } else {
+    let errorMessage = ''
+
+    if (props.type === 'email' && text.value && !isValidEmail(text.value)) {
+      errorMessage = 'Введите корректный email'
+    }
+
+    if (errorMessage) {
+      validationStore.setError(props.name, errorMessage)
+    } else {
+      validationStore.clearError(props.name)
+    }
+  }
+}
+
+const isValidEmail = (email: string) => {
+  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  return re.test(email)
+}
+
 const autoResize = () => {
   if (textareaRef.value && props.maxLines && props.maxLines > 1) {
     const textarea = textareaRef.value
 
-    // Сбрасываем высоту для правильного расчета
     textarea.style.height = 'auto'
 
-    // Вычисляем высоту одной строки
-    const lineHeight = 22 // из line-height: 22px
-    const padding = 6 // верхний и нижний padding (3px сверху + 3px снизу)
-
-    // Максимальная высота = (количество строк * line-height) + padding
+    const lineHeight = 22
+    const padding = 6
     const maxHeight = (props.maxLines * lineHeight) + padding
 
-    // Устанавливаем высоту, но не больше максимальной
     const scrollHeight = textarea.scrollHeight
     textarea.style.height = Math.min(scrollHeight, maxHeight) + 'px'
 
-    // Если контент превышает максимальную высоту, включаем скролл
     if (scrollHeight > maxHeight) {
       textarea.style.overflowY = 'auto'
     } else {
@@ -76,7 +121,6 @@ const autoResize = () => {
   }
 }
 
-// Следим за изменением текста для авто-подстройки высоты
 watch(text, () => {
   if (props.maxLines && props.maxLines > 1) {
     nextTick(() => {
@@ -85,7 +129,6 @@ watch(text, () => {
   }
 })
 
-// Устанавливаем начальную высоту при монтировании
 watch(() => props.maxLines, () => {
   if (props.maxLines && props.maxLines > 1 && textareaRef.value) {
     nextTick(() => {
@@ -93,6 +136,10 @@ watch(() => props.maxLines, () => {
     })
   }
 }, { immediate: true })
+
+onUnmounted(() => {
+  validationStore.clearError(props.name)
+})
 </script>
 
 <style lang="scss" scoped>
@@ -131,7 +178,7 @@ watch(() => props.maxLines, () => {
   outline: none;
   transition: border-color 0.2s ease;
   background: transparent;
-  resize: none; /* Запрещаем ручное изменение размера */
+  resize: none;
 
   &::placeholder {
     color: $gray-light;
@@ -149,6 +196,14 @@ watch(() => props.maxLines, () => {
     border-bottom-color: darken($gray-light, 10%);
   }
 
+  &--error {
+    border-bottom-color: $error !important;
+
+    &:focus {
+      border-bottom-color: $error;
+    }
+  }
+
   &:-webkit-autofill,
   &:-webkit-autofill:hover,
   &:-webkit-autofill:focus {
@@ -160,22 +215,19 @@ watch(() => props.maxLines, () => {
 
 /* Специальные стили для textarea */
 .textarea {
-  min-height: 28px; /* 1 строка + padding */
+  min-height: 28px;
   overflow-y: hidden;
   white-space: pre-wrap;
   word-wrap: break-word;
 
-  /* Для 2 строк */
   &[rows="2"] {
-    max-height: 50px; /* 2 строки * 22px + 6px padding */
+    max-height: 50px;
   }
 
-  /* Для 3 строк */
   &[rows="3"] {
-    max-height: 72px; /* 3 строки * 22px + 6px padding */
+    max-height: 72px;
   }
 
-  /* Стили для скролла, если текст превышает лимит */
   &::-webkit-scrollbar {
     width: 4px;
   }
@@ -215,8 +267,7 @@ watch(() => props.maxLines, () => {
   }
 }
 
-/* Для textarea корректируем позицию иконки */
 .textarea + .input__icon {
-  top: 15px; /* Примерная позиция для многострочного ввода */
+  top: 15px;
 }
 </style>

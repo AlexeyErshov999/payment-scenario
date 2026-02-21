@@ -29,9 +29,6 @@ defineProps<{
   border-radius: $border-radius-default;
   padding-block: $padding-vertical-form;
   padding-inline: $padding-horizontal-form;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
   margin-inline: auto;
 
   &--has-shadow {
@@ -39,7 +36,8 @@ defineProps<{
   }
 
   &__title {
-    font-size: $font-size-l;
+    font-size: 24px;
+    line-height: 32px;
     color: $gray-dark;
     margin-block-end: var(--card-title-margin);
     font-weight: 600;
