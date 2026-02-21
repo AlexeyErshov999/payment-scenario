@@ -47,7 +47,7 @@ const submitForm = () => {
           :rules="descriptionRules"
         />
 
-        <SubmitButton text="12 000" type="submit" :has-form-errors="validationStore.hasErrors" />
+        <SubmitButton text="Создать" type="submit" :has-form-errors="validationStore.hasErrors" />
       </form>
     </FormCard>
   </PageContainer>

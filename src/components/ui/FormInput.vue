@@ -1,6 +1,6 @@
 <template>
   <div class="input-wrapper">
-    <label class="input__label">{{ label }}</label>
+    <label class="input__label" :class="{ 'input__label--error': localError }">{{ label }}</label>
     <div class="input-container" :class="{ 'has-icon': icon }">
       <textarea
         v-if="maxLines && maxLines > 1"
@@ -26,7 +26,7 @@
         @blur="validateField"
       />
 
-      <span v-if="icon" class="input__icon" v-html="icon"></span>
+      <span v-if="icon" class="input__icon" :class="{ 'input__icon--error': localError }" v-html="icon"></span>
     </div>
     <ErrorMessage v-if="localError" :text="localError" />
   </div>
@@ -158,6 +158,10 @@ onUnmounted(() => {
   font-size: 12px;
   line-height: 13px;
   font-weight: 400;
+
+  &--error {
+    color: $error
+  }
 }
 
 .input-container {
@@ -197,6 +201,7 @@ onUnmounted(() => {
   }
 
   &--error {
+    color: $error;
     border-bottom-color: $error !important;
 
     &:focus {
@@ -264,6 +269,10 @@ onUnmounted(() => {
     width: 100%;
     height: 100%;
     fill: currentColor;
+  }
+
+  &--error {
+    color: $error;
   }
 }
 
