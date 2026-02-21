@@ -8,7 +8,7 @@ const routes = [
   {
     path: '/order',
     name: 'order',
-    component: () => import('@/views/Order.vue'),
+    component: () => import('@/views/OrderForm.vue'),
     meta: {
       title: 'Создание заказа',
       requiresOrderData: false,

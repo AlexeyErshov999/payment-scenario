@@ -6,6 +6,7 @@ interface Props {
   loading?: boolean
   disabled?: boolean
   redirectTo?: string
+  hasFormErrors: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -13,6 +14,7 @@ const props = withDefaults(defineProps<Props>(), {
   loading: false,
   disabled: false,
   redirectTo: '',
+  hasFormErrors: false
 })
 
 const emit = defineEmits<{
@@ -40,7 +42,7 @@ const handleClick = async (event: MouseEvent) => {
   <button
     class="submit-button"
     :class="{ 'is-loading': loading }"
-    :disabled="disabled"
+    :disabled="disabled || hasFormErrors"
     @click="handleClick"
   >
     <span v-if="loading" class="spinner" />
