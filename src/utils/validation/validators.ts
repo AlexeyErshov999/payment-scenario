@@ -1,24 +1,17 @@
-// Проверки на валидность введенного значения
-export const isValidEmail = (email: string) => {
-  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  return re.test(email)
-}
+import { VALIDATION_MESSAGES } from './messages'
 
-// Валидация номера карты
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+/** Проверка email на соответствие формату */
+export const isValidEmail = (email: string): boolean => EMAIL_REGEX.test(email)
+
+/** Валидация номера карты */
 export const validateCardNumber = (value: string): string | boolean => {
   const digits = value.replace(/\D/g, '')
 
-  if (!digits) {
-    return 'Введите номер карты'
-  }
-
-  if (digits.length !== 16) {
-    return 'Номер карты должен содержать 16 цифр'
-  }
-
-  if (!luhnCheck(digits)) {
-    return 'Недействительный номер карты'
-  }
+  if (!digits) return VALIDATION_MESSAGES.CARD_REQUIRED
+  if (digits.length !== 16) return VALIDATION_MESSAGES.CARD_LENGTH
+  if (!luhnCheck(digits)) return VALIDATION_MESSAGES.CARD_INVALID
 
   return true
 }
@@ -43,24 +36,69 @@ function luhnCheck(cardNumber: string): boolean {
   return sum % 10 === 0
 }
 
-// Валидация цены в поле ввода цены
-export const validatePrice = (value: string, parsePrice: (value: string) => string, formatPrice: (value: string) => string, max: number, min: number): string | boolean => {
+type PriceParser = (value: string) => string
+type PriceFormatter = (value: string) => string
+
+/**
+ * Валидация суммы в поле ввода цены
+ * @param value — сырое значение из поля
+ * @param parsePrice — функция парсинга в цифры
+ * @param formatPrice — функция форматирования для сообщений
+ * @param min — минимальная сумма (включительно)
+ * @param max — максимальная сумма (включительно)
+ */
+export const validatePrice = (
+  value: string,
+  parsePrice: PriceParser,
+  formatPrice: PriceFormatter,
+  min: number,
+  max: number
+): string | boolean => {
   const parsed = parsePrice(value)
-  if (!/^\d+$/.test(parsed)) {
-    return 'Введите целое число'
+  if (!parsed || !/^\d+$/.test(parsed)) {
+    return VALIDATION_MESSAGES.AMOUNT_INTEGER
   }
-  const number = Number(parsed)
-  if (!Number.isInteger(number)) {
-    return 'Сумма должна быть целым числом'
+  const num = Number(parsed)
+  if (!Number.isInteger(num)) {
+    return VALIDATION_MESSAGES.AMOUNT_INTEGER
   }
-  if (number < min) {
-    return `Сумма должна быть не менее ${formatPrice(min.toString())}`
+  if (num < 0) {
+    return VALIDATION_MESSAGES.AMOUNT_NOT_NEGATIVE
   }
-  if (number > max) {
-    return `Сумма должна быть не более ${formatPrice(max.toString())}`
+  if (num < min) {
+    return VALIDATION_MESSAGES.AMOUNT_MIN(formatPrice(min.toString()))
   }
-  if (number < 0) {
-    return 'Сумма не может быть отрицательной'
+  if (num > max) {
+    return VALIDATION_MESSAGES.AMOUNT_MAX(formatPrice(max.toString()))
   }
+  return true
+}
+
+/**
+ * Валидация срока действия карты (ММ/ГГ)
+ * @param value — значение из поля (форматированное)
+ * @param parseExpireDate — функция парсинга в 4 цифры (ММГГ)
+ */
+export const validateExpireDate = (
+  value: string,
+  parseExpireDate: (value: string) => string
+): string | boolean => {
+  const digits = parseExpireDate(value)
+
+  if (!digits) return VALIDATION_MESSAGES.EXPIRE_REQUIRED
+  if (digits.length !== 4) return VALIDATION_MESSAGES.EXPIRE_FORMAT
+
+  const month = parseInt(digits.slice(0, 2), 10)
+  if (month < 1 || month > 12) return VALIDATION_MESSAGES.EXPIRE_MONTH_INVALID
+
+  const year = parseInt(digits.slice(2), 10)
+  const now = new Date()
+  const currentYear = now.getFullYear() % 100
+  const currentMonth = now.getMonth() + 1
+
+  if (year < currentYear || (year === currentYear && month < currentMonth)) {
+    return VALIDATION_MESSAGES.EXPIRE_EXPIRED
+  }
+
   return true
 }

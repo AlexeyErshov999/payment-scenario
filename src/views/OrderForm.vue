@@ -7,7 +7,11 @@ import SubmitButton from '../components/base/SubmitButton.vue'
 import FormInput from '../components/base/FormInput.vue'
 import { useValidationErrorsStore } from '../stores/validationErrorsStore'
 import { useOrderStore } from '../stores/orderStore'
-import { amountRules, emailRules, descriptionRules } from '../utils/validation/validationRules'
+import {
+  emailRules,
+  descriptionRules,
+  validateOrderFormData,
+} from '../utils/validation/validationRules'
 import PriceInput from '../components/inputs/PriceInput.vue'
 
 const router = useRouter()
@@ -25,29 +29,16 @@ const isSubmitting = ref(false)
 const submitError = ref<string | null>(null)
 
 const getFormData = (): { amount: number; email: string; description: string } | null => {
-  const cleanedAmount = formData.amount.replace(/\s/g, '').replace(',', '.')
-  const amount = parseFloat(cleanedAmount)
+  const result = validateOrderFormData(formData)
 
-  if (isNaN(amount) || amount <= 0) {
-    validationStore.addError('amount', 'Сумма должна быть положительным числом')
+  if (!result.valid) {
+    for (const [field, message] of Object.entries(result.errors)) {
+      validationStore.addError(field, message)
+    }
     return null
   }
 
-  if (!formData.email.trim()) {
-    validationStore.addError('email', 'Email обязателен')
-    return null
-  }
-
-  if (!formData.description.trim()) {
-    validationStore.addError('description', 'Описание обязательно')
-    return null
-  }
-
-  return {
-    amount,
-    email: formData.email.trim(),
-    description: formData.description.trim()
-  }
+  return result.data
 }
 
 const submitForm = async () => {
@@ -103,10 +94,8 @@ const submitForm = async () => {
           v-model="formData.amount"
           name="amount"
           label="Введите сумму заказа"
-          type="text"
           placeholder="0"
           icon="₽"
-          :rules="amountRules"
         />
 
         <FormInput

@@ -21,6 +21,7 @@
 import { computed } from 'vue'
 import FormInput from '../base/FormInput.vue'
 import { formatPrice, parsePrice } from '../../utils/format/price'
+import { createPriceRules } from '../../utils/validation/validationRules'
 
 interface IPriceInputProps {
   name: string
@@ -40,7 +41,8 @@ const props = withDefaults(defineProps<IPriceInputProps>(), {
   currency: '₽',
   showCurrency: true,
   min: 0,
-  max: Infinity
+  max: Infinity,
+  required: true,
 })
 
 defineEmits<{
@@ -48,37 +50,5 @@ defineEmits<{
   (e: 'input', value: string): void
 }>()
 
-const validatePrice = (value: string): string | boolean => {
-  if (!value) {
-    return props.required ? 'Введите сумму' : true
-  }
-  const parsed = parsePrice(value)
-  if (parsed && isNaN(Number(parsed))) {
-    return 'Введите корректную сумму'
-  }
-  const number = Number(parsed)
-  if (number < props.min) {
-    return `Сумма должна быть не менее ${formatPrice(props.min.toString())}`
-  }
-  if (number > props.max) {
-    return `Сумма должна быть не более ${formatPrice(props.max.toString())}`
-  }
-  return true
-}
-
-const validatePositive = (value: string): string | boolean => {
-  if (!value) return true
-
-  const number = Number(parsePrice(value))
-  if (number < 0) {
-    return 'Сумма не может быть отрицательной'
-  }
-
-  return true
-}
-
-const priceRules = computed(() => {
-  const rules = [validatePrice, validatePositive]
-  return rules
-})
+const priceRules = computed(() => createPriceRules(props.min, props.max, props.required))
 </script>
