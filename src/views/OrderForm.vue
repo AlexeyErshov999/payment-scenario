@@ -134,15 +134,39 @@ const submitForm = async () => {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+
+  @media (max-width: 374px) {
+    gap: 10px;
+  }
+
+  @media (min-width: 640px) {
+    gap: 16px;
+  }
+
+  @media (min-width: 1024px) {
+    gap: 20px;
+  }
+
+  @media (max-height: 500px) and (max-width: 640px) {
+    gap: 8px;
+  }
 }
 
 .error-message {
   color: #ff4444;
-  font-size: 14px;
+  font-size: 13px;
   padding: 8px;
   background-color: rgba(255, 68, 68, 0.1);
   border-radius: 4px;
   text-align: center;
+
+  @media (min-width: 640px) {
+    font-size: 14px;
+    padding: 10px;
+  }
 }
 
 .reset-btn {
@@ -156,6 +180,11 @@ const submitForm = async () => {
 
   &:hover {
     background-color: #f5f5f5;
+  }
+
+  @media (max-width: 374px) {
+    padding: 10px 12px;
+    font-size: 13px;
   }
 }
 
@@ -171,6 +200,11 @@ const submitForm = async () => {
     margin: 5px 0 0;
     white-space: pre-wrap;
     word-wrap: break-word;
+  }
+
+  @media (max-width: 374px) {
+    padding: 8px;
+    font-size: 11px;
   }
 }
 
