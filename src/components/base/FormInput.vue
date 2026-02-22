@@ -1,6 +1,14 @@
 <template>
   <div class="input-wrapper">
-    <label class="input__label" :class="{ 'input__label--error': localError }">{{ label }}</label>
+    <label class="input__label" :class="{ 'input__label--error': localError }">
+      <span v-if="$slots.labelSuffix" class="input__label-inner">
+        {{ label }}
+        <span class="input__label-suffix">
+          <slot name="labelSuffix" />
+        </span>
+      </span>
+      <template v-else>{{ label }}</template>
+    </label>
     <div class="input-container" :class="{ 'has-icon': icon }">
       <textarea
         v-if="maxLines && maxLines > 1"
@@ -30,7 +38,9 @@
 
       <span v-if="icon" class="input__icon" :class="{ 'input__icon--error': localError }" v-html="icon"></span>
     </div>
-    <ErrorMessage v-if="localError" :text="localError" />
+    <div class="input__error-slot">
+      <ErrorMessage v-if="localError" :text="localError" />
+    </div>
   </div>
 </template>
 
@@ -201,6 +211,20 @@ onUnmounted(() => {
   }
 }
 
+.input__label-inner {
+  display: inline;
+  position: relative;
+}
+
+.input__label-suffix {
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  margin-left: 4px;
+  transform: translateY(-50%);
+  white-space: nowrap;
+}
+
 .input-container {
   position: relative;
   width: 100%;
@@ -224,7 +248,7 @@ onUnmounted(() => {
   &::placeholder {
     color: $gray-light;
     font-weight: 400;
-    font-size: 16px;
+    font-size: 18px;
     font-family: inherit;
   }
 
@@ -289,6 +313,11 @@ onUnmounted(() => {
       background: $gray-dark;
     }
   }
+}
+
+.input__error-slot {
+  min-height: 18px;
+  margin-top: 2px;
 }
 
 .input__icon {

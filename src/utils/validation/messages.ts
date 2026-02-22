@@ -4,9 +4,9 @@ export const VALIDATION_MESSAGES = {
   ENTER_VALUE: (field: string) => `Введите ${field}`,
 
   // Карта
-  CARD_REQUIRED: 'Введите номер карты',
-  CARD_LENGTH: 'Номер карты должен содержать 16 цифр',
-  CARD_INVALID: 'Недействительный номер карты',
+  CARD_REQUIRED: 'Обязательное поле',
+  CARD_LENGTH: 'Должно быть 16 цифр',
+  CARD_INVALID: 'Неверный номер',
 
   // Сумма
   AMOUNT_REQUIRED: 'Введите сумму',
@@ -26,8 +26,12 @@ export const VALIDATION_MESSAGES = {
   DESCRIPTION_MAX: 'Описание должно быть не более 500 символов',
 
   // Срок действия карты
-  EXPIRE_REQUIRED: 'Введите срок действия карты',
-  EXPIRE_FORMAT: 'Введите дату в формате ММ/ГГ',
-  EXPIRE_MONTH_INVALID: 'Некорректный месяц',
-  EXPIRE_EXPIRED: 'Срок действия карты истёк',
+  EXPIRE_REQUIRED: 'Обязательное поле',
+  EXPIRE_FORMAT: 'Формат: ММ/ГГ',
+  EXPIRE_MONTH_INVALID: 'Неверный месяц',
+  EXPIRE_EXPIRED: 'Карта просрочена',
+
+  // CVV/CVC
+  CVV_REQUIRED: 'Обязательное поле',
+  CVV_MIN: 'Минимум 3 цифры',
 } as const
