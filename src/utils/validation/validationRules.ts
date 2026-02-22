@@ -1,3 +1,6 @@
+import { validateCardNumber } from "./validators"
+
+// Правила валидации полей формы создания заказа
 export const amountRules = [
   (value: string) => {
     if (!value) return 'Сумма обязательна'
@@ -24,3 +27,5 @@ export const descriptionRules = [
     return true
   },
 ]
+
+export const cardNumberRules = [validateCardNumber]

@@ -28,7 +28,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/payment',
     name: 'payment',
-    component: () => import('../../src/views/OrderPayment.vue'),
+    component: () => import('@/views/OrderPayment.vue'),
     meta: {
       title: 'Оплата заказа',
       requiresOrderData: true,
