@@ -1,7 +1,18 @@
 <script setup lang="ts">
-console.log('OrderPayment loaded')
+import CardNumberInput from '../components/inputs/CardNumberInput.vue';
+import PageContainer from '../components/base/PageContainer.vue';
+import FormCard from '../components/base/FormCard.vue';
 </script>
 
 <template>
-  <h1>Payment</h1>
+  <PageContainer full-viewport>
+    <FormCard :has-shadow="true">
+      <CardNumberInput
+        name="card-number"
+        label="Номер карты"
+        type="cardNumber"
+        placeholder="1234 5678 1234 5678"
+      />
+    </FormCard>
+  </PageContainer>
 </template>

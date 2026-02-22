@@ -19,7 +19,7 @@ defineProps<{
 
 .validation-error {
   display: block;
-  color: #FF3B30;
+  color: $error;
   font-weight: 400;
   font-size: 12px;
   line-height: 13px;

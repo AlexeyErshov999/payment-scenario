@@ -23,7 +23,9 @@
         v-model="inputValue"
         :placeholder="placeholder"
         :style="{ paddingRight: icon ? '30px' : '12px' }"
+        @input="handleInput"
         @blur="validateField"
+        v-bind="$attrs"
       />
 
       <span v-if="icon" class="input__icon" :class="{ 'input__icon--error': localError }" v-html="icon"></span>
@@ -37,7 +39,7 @@ import { ref, watch, nextTick, computed, onUnmounted } from 'vue'
 import ErrorMessage from './ErrorMessage.vue'
 import { useValidationErrorsStore } from '../../stores/validationErrorsStore'
 
-interface IFormInputProps {
+interface IBaseInputProps {
   name: string
   label: string
   type?: 'text' | 'email' | 'password' | 'tel' | 'number'
@@ -47,12 +49,19 @@ interface IFormInputProps {
   maxLines?: number
   rules?: Array<(value: string) => string | boolean>
   modelValue?: string | number
+  formatter?: (value: string) => string
+  parser?: (value: string) => string
 }
 
-const props = defineProps<IFormInputProps>()
+const props = withDefaults(defineProps<IBaseInputProps>(), {
+  type: 'text',
+  formatter: (value: string) => value,
+  parser: (value: string) => value
+})
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: string): void
+  (e: 'input', value: string): void
 }>()
 
 const text = ref(props.modelValue?.toString() || '')
@@ -66,11 +75,42 @@ const localError = computed(() => {
   return fieldErrors && fieldErrors.length > 0 ? fieldErrors[0] : undefined
 })
 
+const handleInput = (event: Event) => {
+  const input = event.target as HTMLInputElement
+  const cursorPosition = input.selectionStart
+
+  const rawValue = input.value
+  const parsedValue = props.parser(rawValue)
+  const formattedValue = props.formatter(parsedValue)
+
+  if (formattedValue !== rawValue) {
+    input.value = formattedValue
+
+    if (cursorPosition !== null) {
+      const diff = formattedValue.length - rawValue.length
+      nextTick(() => {
+        input.setSelectionRange(cursorPosition + diff, cursorPosition + diff)
+      })
+    }
+  }
+
+  text.value = parsedValue
+  emit('update:modelValue', parsedValue)
+  emit('input', parsedValue)
+
+  if ((validationStore.allErrors[props.name] || []).length > 0) {
+    validationStore.clearFieldErrors(props.name)
+  }
+}
+
 const inputValue = computed({
-  get: () => text.value,
+  get: () => props.formatter(text.value),
   set: (value) => {
-    text.value = value
-    emit('update:modelValue', value)
+    const parsed = props.parser(value)
+    text.value = parsed
+    emit('update:modelValue', parsed)
+    emit('input', parsed)
+
     if ((validationStore.allErrors[props.name] || []).length > 0) {
       validationStore.clearFieldErrors(props.name)
     }
@@ -88,22 +128,7 @@ const validateField = () => {
         return
       }
     }
-  } else {
-    let errorMessage = ''
-
-    if (props.type === 'email' && text.value && !isValidEmail(text.value)) {
-      errorMessage = 'Введите корректный email'
-    }
-
-    if (errorMessage) {
-      validationStore.addError(props.name, errorMessage)
-    }
   }
-}
-
-const isValidEmail = (email: string) => {
-  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  return re.test(email)
 }
 
 const autoResize = () => {
@@ -200,6 +225,7 @@ onUnmounted(() => {
     color: $gray-light;
     font-weight: 400;
     font-size: 16px;
+    font-family: inherit;
   }
 
   caret-color: $accent-color;
@@ -236,6 +262,7 @@ onUnmounted(() => {
   overflow-y: hidden;
   white-space: pre-wrap;
   word-wrap: break-word;
+  font-family: inherit;
 
   &[rows="2"] {
     max-height: 50px;

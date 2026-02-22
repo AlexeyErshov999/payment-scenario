@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
-import PageContainer from '../components/ui/PageContainer.vue'
-import FormCard from '../components/ui/FormCard.vue'
-import SubmitButton from '../components/ui/SubmitButton.vue'
-import FormInput from '../components/ui/FormInput.vue'
+import PageContainer from '../components/base/PageContainer.vue'
+import FormCard from '../components/base/FormCard.vue'
+import SubmitButton from '../components/base/SubmitButton.vue'
+import FormInput from '../components/base/FormInput.vue'
 import { useValidationErrorsStore } from '../stores/validationErrorsStore'
 import { useOrderStore } from '../stores/orderStore'
-import { amountRules, emailRules, descriptionRules } from '../utils/validationRules'
+import { amountRules, emailRules, descriptionRules } from '../utils/validation/validationRules'
+import PriceInput from '../components/inputs/PriceInput.vue'
 
 const router = useRouter()
 
@@ -98,13 +99,13 @@ const submitForm = async () => {
   <PageContainer full-viewport>
     <FormCard :has-shadow="true" title="Создание заказа">
       <form @submit.prevent="submitForm" class="form">
-        <FormInput
+        <PriceInput
           v-model="formData.amount"
           name="amount"
           label="Введите сумму заказа"
           type="text"
           placeholder="0"
-          icon="RUB"
+          icon="₽"
           :rules="amountRules"
         />
 
@@ -126,10 +127,6 @@ const submitForm = async () => {
           :max-lines="3"
           :rules="descriptionRules"
         />
-
-        <div v-if="submitError" class="error-message">
-          {{ submitError }}
-        </div>
 
         <SubmitButton
           :text="isSubmitting ? 'Создание...' : 'Создать'"
