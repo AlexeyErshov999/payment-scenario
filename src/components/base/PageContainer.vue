@@ -1,6 +1,8 @@
 <template>
   <div class="center" :class="{ 'full-viewport': fullViewport }">
-    <slot />
+    <div class="center__inner">
+      <slot />
+    </div>
   </div>
 </template>
 
@@ -16,9 +18,23 @@ defineProps<{
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  padding: 1rem;
+  box-sizing: border-box;
 
   &.full-viewport {
     block-size: 100vh;
+  }
+}
+
+.center__inner {
+  width: 100%;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  @media (min-width: 640px) {
+    padding: 0 0.5rem;
   }
 }
 </style>

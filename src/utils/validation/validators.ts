@@ -102,3 +102,13 @@ export const validateExpireDate = (
 
   return true
 }
+
+/** Валидация CVV/CVC (3–4 цифры, только цифры) */
+export const validateCvv = (value: string): string | boolean => {
+  const digits = value.replace(/\D/g, '')
+
+  if (!digits) return VALIDATION_MESSAGES.CVV_REQUIRED
+  if (digits.length < 3) return VALIDATION_MESSAGES.CVV_MIN
+
+  return true
+}

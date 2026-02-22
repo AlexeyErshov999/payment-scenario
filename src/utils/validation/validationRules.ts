@@ -1,4 +1,10 @@
-import { validateCardNumber, validatePrice, validateExpireDate, isValidEmail } from './validators'
+import {
+  validateCardNumber,
+  validatePrice,
+  validateExpireDate,
+  validateCvv,
+  isValidEmail,
+} from './validators'
 import { VALIDATION_MESSAGES } from './messages'
 import { formatPrice, parsePrice } from '../format/price'
 import { parseExpireDate } from '../format/expireDate'
@@ -52,6 +58,9 @@ export const cardNumberRules: ValidationRule[] = [validateCardNumber]
 export const expireDateRules: ValidationRule[] = [
   (value: string) => validateExpireDate(value, parseExpireDate),
 ]
+
+/** Правила для поля CVV/CVC */
+export const cvvRules: ValidationRule[] = [validateCvv]
 
 /** Запуск правил, возвращает первую ошибку или true */
 export const runRules = (value: string, rules: ValidationRule[]): string | true => {
