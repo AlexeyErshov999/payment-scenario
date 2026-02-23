@@ -13,6 +13,9 @@ import { useOrderStore } from '../stores/orderStore'
 import { useValidationErrorsStore } from '../stores/validationErrorsStore'
 import { formatNumberAsPrice } from '../utils/format/price'
 import { useRouter } from 'vue-router'
+import { useCardDataStore } from '../stores/cardDataStore'
+
+const cardDataStore = useCardDataStore()
 
 const router = useRouter()
 
@@ -37,7 +40,6 @@ const fillForm = () => {
   ) {
     const parsedData = JSON.parse(cardData)
     cardNumber.value = parsedData.cardNumber
-    cardDate.value = `${parsedData.expired.month} / ${parsedData.expired.year}`
   } else {
     return
   }
@@ -66,24 +68,24 @@ const canPay = computed(
 const handlePay = async () => {
   if (!canPay.value) return
   isSubmitting.value = true
+  cardDataStore.loading = true
 
-  const month = cardDate.value.substring(0, 2)
-  const year = cardDate.value.substring(2, 4)
+
   try {
     // TODO: подумать про оплату
     if (saveCard.value) {
       localStorage.setItem('cardData', JSON.stringify({
       cardNumber: cardNumber.value,
-      expired: {
-        month,
-        year
-      }
     }))
     }
     orderStore.setPaymentStatus('success')
+    orderStore.setPaymentPassed(true)
+    // Имитирую задержку сети, чтобы на кнопке появился лоадер
+    await new Promise(resolve => setTimeout(resolve, 2000))
     await router.push('/payment-result')
   } finally {
     isSubmitting.value = false
+    cardDataStore.loading = false
   }
 }
 </script>
@@ -123,7 +125,7 @@ const handlePay = async () => {
           <div class="pay-section">
             <SubmitButton
               :text="isSubmitting ? 'Обработка...' : payButtonText"
-              :loading="isSubmitting"
+              :loading="cardDataStore.loading"
               :disabled="!canPay"
               :has-form-errors="validationStore.hasErrors"
               @click="handlePay"
@@ -161,7 +163,7 @@ const handlePay = async () => {
   max-width: 20rem;
   margin-inline: auto;
   display: flex;
-  flex-direction: column;
+  flex-direction: column;;
   align-items: center;
 
   @media (min-width: 640px) {
@@ -202,6 +204,8 @@ const handlePay = async () => {
 }
 
 .save-card-row {
+  display: flex;
+  justify-content: center;
   width: 100%;
   margin-top: 1.75rem;
   padding-top: 0.75rem;

@@ -3,10 +3,6 @@ import { ref, computed } from 'vue'
 
 export interface CardData {
   cardNum: string
-  expired: {
-    month: string,
-    year: string
-  }
 }
 
 // Стор будет хранить данные карты, если проставили чекбокс запомнить карту

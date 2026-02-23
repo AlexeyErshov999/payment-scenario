@@ -56,38 +56,32 @@ const router = createRouter({
   routes,
 })
 
-// router.beforeEach(async (to, from, next) => {
-//   if (to.meta.title) {
-//     document.title = to.meta.title
-//   }
+router.beforeEach(async (to, from, next) => {
+  if (to.meta.title) {
+    document.title = to.meta.title
+  }
 
-//   const orderStore = useOrderStore()
-//   const validationStore = useValidationErrorsStore()
+  const orderStore = useOrderStore()
+  const validationStore = useValidationErrorsStore()
 
-//   validationStore.clearAllErrors()
+  validationStore.clearAllErrors()
 
-//   if (orderStore.loading) {
-//     await new Promise(resolve => setTimeout(resolve, 100))
-//   }
+  if (to.meta.requiresOrderData && !orderStore.hasOrderData) {
+    console.log('No order data, redirecting to /order')
+    next('/order')
+    return
+  }
 
-//   if (to.meta.requiresOrderData && !orderStore.hasOrderData) {
-//     console.log('No order data, redirecting to /order')
-//     next('/order')
-//     return
-//   }
+  if (to.meta.requiresPayment) {
+    // Этап оплаты всегда считается пройденным после сабмита формы оплаты
+    if (!orderStore.getPaymentPassed()) {
+      console.log('Payment required, redirecting to /payment')
+      next('/payment')
+      return
+    }
+  }
 
-//   if (to.meta.requiresPayment) {
-//     // TODO: подумать про оплату
-//     const paymentCompleted = false
-
-//     if (!paymentCompleted) {
-//       console.log('Payment required, redirecting to /payment')
-//       next('/payment')
-//       return
-//     }
-//   }
-
-//   next()
-// })
+  next()
+})
 
 export default router

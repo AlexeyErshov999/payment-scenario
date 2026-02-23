@@ -14,6 +14,9 @@ import {
 } from '../utils/validation/validationRules'
 import PriceInput from '../components/inputs/PriceInput.vue'
 
+// Чищу данные о заказе в localStorage, чтобы приложение корректно работало при новом заказе
+localStorage.removeItem('orderData')
+
 const router = useRouter()
 
 const validationStore = useValidationErrorsStore()
@@ -43,12 +46,11 @@ const getFormData = (): { amount: number; email: string; description: string } |
 
 const submitForm = async () => {
   isSubmitting.value = true
+  orderStore.loading = true
   submitError.value = null
 
   try {
     validationStore.clearAllErrors()
-
-    await new Promise(resolve => setTimeout(resolve, 50))
 
     const amountInput = document.querySelector('[name="amount"]') as HTMLElement
     const emailInput = document.querySelector('[name="email"]') as HTMLElement
@@ -57,8 +59,6 @@ const submitForm = async () => {
     amountInput?.blur()
     emailInput?.blur()
     descriptionInput?.blur()
-
-    await new Promise(resolve => setTimeout(resolve, 100))
 
     if (validationStore.hasErrors) {
       console.log('Ошибки валидации:', validationStore.allErrors)
@@ -75,6 +75,8 @@ const submitForm = async () => {
 
     console.log('Заказ успешно создан:', orderData)
 
+    // Имитирую задержку сети, чтобы на кнопке появился лоадер
+    await new Promise(resolve => setTimeout(resolve, 2000))
     await router.push('/payment')
 
   } catch (error) {
@@ -82,6 +84,7 @@ const submitForm = async () => {
     submitError.value = 'Произошла ошибка при создании заказа. Пожалуйста, попробуйте снова.'
   } finally {
     isSubmitting.value = false
+    orderStore.loading = false
   }
 }
 </script>
@@ -118,11 +121,11 @@ const submitForm = async () => {
         />
 
         <SubmitButton
-          :text="isSubmitting ? 'Создание...' : 'Создать'"
+          text="Создать"
           type="submit"
           :disabled="isSubmitting"
           :has-form-errors="validationStore.hasErrors"
-          redirect-to="/payment"
+          :loading="orderStore.loading"
         />
       </form>
     </FormCard>

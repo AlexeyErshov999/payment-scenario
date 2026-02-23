@@ -42,9 +42,9 @@ const resultImage = computed(() => {
 <template>
   <PageContainer full-viewport>
     <img :src="resultImage" alt="Эмодзи, отражающий результат оплаты" />
-    <FromText class="result__text">
+    <FormText class="result__text">
       {{ resultText }}
-    </FromText>
+    </FormText>
     <PaymentFooter :order-number="orderStore.orderData?.orderId" />
   </PageContainer>
 </template>

@@ -17,6 +17,7 @@ export const useOrderStore = defineStore('order', () => {
   const error = ref<string | null>(null)
 
   const paymentStatus = ref<string>('success')
+  const isPaymentPassed = ref<boolean>(false)
 
   const hasOrderData = computed<boolean>(() => !!orderData.value)
 
@@ -53,6 +54,14 @@ export const useOrderStore = defineStore('order', () => {
     return paymentStatus.value
   }
 
+  function setPaymentPassed(isPassed: boolean) {
+    isPaymentPassed.value = isPassed
+  }
+
+  function getPaymentPassed() {
+    return isPaymentPassed.value
+  }
+
   function clearOrderData(): void {
     orderData.value = null
     localStorage.removeItem('orderData')
@@ -81,6 +90,8 @@ export const useOrderStore = defineStore('order', () => {
 
     setOrderData,
     setPaymentStatus,
+    setPaymentPassed,
+    getPaymentPassed,
     getPaymentStatus,
     clearOrderData,
     loadOrderDataFromStorage
