@@ -5,6 +5,7 @@ export interface OrderData {
   amount: number | string
   email: string
   description: string
+  orderId?: string
   createdAt?: string
 }
 
@@ -25,8 +26,10 @@ export const useOrderStore = defineStore('order', () => {
   })
 
   function setOrderData(data: OrderData): void {
+    const orderId = data.orderId ?? String(100000 + Math.floor(Math.random() * 900000))
     orderData.value = {
       ...data,
+      orderId,
       createdAt: new Date().toISOString()
     }
 

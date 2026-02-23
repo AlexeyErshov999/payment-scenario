@@ -1,31 +1,176 @@
 <script setup lang="ts">
-import CardNumberInput from '../components/inputs/CardNumberInput.vue';
-import PageContainer from '../components/base/PageContainer.vue';
-import FormCard from '../components/base/FormCard.vue';
-import ExpireDateInput from '../components/inputs/ExpireDateInput.vue';
-import CvvInput from '../components/inputs/CvvInput.vue';
+import { ref, computed, onMounted } from 'vue'
+import CardNumberInput from '../components/inputs/CardNumberInput.vue'
+import PageContainer from '../components/base/PageContainer.vue'
+import FormCard from '../components/base/FormCard.vue'
+import ExpireDateInput from '../components/inputs/ExpireDateInput.vue'
+import CvvInput from '../components/inputs/CvvInput.vue'
+import Checkbox from '../components/base/Checkbox.vue'
+import FormText from '../components/base/FormText.vue'
+import SubmitButton from '../components/base/SubmitButton.vue'
+import PaymentFooter from '../components/payment/PaymentFooter.vue'
+import { useOrderStore } from '../stores/orderStore'
+import { useValidationErrorsStore } from '../stores/validationErrorsStore'
+import { formatNumberAsPrice } from '../utils/format/price'
+import { useCardDataStore } from '../stores/cardDataStore'
+
+const saveCard = ref(false)
+const isSubmitting = ref(false)
+const cardNumber = ref('')
+const cardDate = ref('')
+const cvv = ref('')
+const orderStore = useOrderStore()
+const validationStore = useValidationErrorsStore()
+const cardDataStore = useCardDataStore()
+
+const isFormFilled = computed(() => {
+  const cn = (cardNumber.value || '').replace(/\s/g, '')
+  const cd = (cardDate.value || '').replace(/\s/g, '')
+  return cn.length >= 16 && cd.length >= 4 && (cvv.value || '').replace(/\D/g, '').length >= 3
+})
+
+const fillForm = () => {
+  if (
+    cardDataStore.cardData?.cardNum &&
+    cardDataStore.cardData.expired.month &&
+    cardDataStore.cardData.expired.year
+  ) {
+    cardNumber.value = cardDataStore.cardData?.cardNum
+    cardDate.value = `${cardDataStore.cardData.expired.month} / ${cardDataStore.cardData.expired.year}`
+  } else {
+    return
+  }
+}
+
+onMounted(() => {
+  fillForm()
+})
+
+const formattedAmount = computed(() => {
+  const amount = orderStore.orderData?.amount
+  if (amount == null) return ''
+  const num = typeof amount === 'string' ? parseInt(amount, 10) : amount
+  return isNaN(num) ? '' : formatNumberAsPrice(num) + ' ₽'
+})
+
+const payButtonText = computed(() => {
+  const amount = formattedAmount.value
+  return amount ? `Оплатить ${amount}` : 'Оплатить'
+})
+
+const canPay = computed(
+  () => !isSubmitting.value && isFormFilled.value && !validationStore.hasErrors,
+)
+
+const handlePay = async () => {
+  if (!canPay.value) return
+  isSubmitting.value = true
+  try {
+    // TODO: подумать про оплату
+  } finally {
+    isSubmitting.value = false
+  }
+}
 </script>
 
 <template>
   <PageContainer full-viewport>
-    <FormCard :has-shadow="true">
-      <template #logo>
-        <img class="card__logo-placeholder" src="../assets/icons/bank_logo.svg"/>
-      </template>
-      <CardNumberInput
-        name="card-number"
-        label="Номер карты"
-        placeholder="1234 5678 9012 9999"
-      />
-      <div class="form-row">
-        <ExpireDateInput name="card-date" label="Месяц / год" placeholder="12 / 24" />
-        <CvvInput name="cvv" placeholder="123" />
+    <div class="order-payment-page">
+      <div class="order-payment-page__main">
+        <div class="payment-layout">
+          <FormCard :has-shadow="true">
+            <template #logo>
+              <img class="card__logo-placeholder" src="../assets/icons/bank_logo.svg" alt="" />
+            </template>
+            <div class="payment-form">
+              <CardNumberInput
+                v-model="cardNumber"
+                name="card-number"
+                label="Номер карты"
+                placeholder="1234 5678 9012 9999"
+              />
+              <div class="form-row">
+                <ExpireDateInput
+                  v-model="cardDate"
+                  name="card-date"
+                  label="Месяц / год"
+                  placeholder="12 / 24"
+                />
+                <CvvInput v-model="cvv" name="cvv" placeholder="123" />
+              </div>
+            </div>
+          </FormCard>
+          <div class="save-card-row">
+            <Checkbox v-model="saveCard">
+              <FormText>Сохранить карту для следующих покупок</FormText>
+            </Checkbox>
+          </div>
+          <div class="pay-section">
+            <SubmitButton
+              :text="isSubmitting ? 'Обработка...' : payButtonText"
+              :loading="isSubmitting"
+              :disabled="!canPay"
+              :has-form-errors="validationStore.hasErrors"
+              @click="handlePay"
+            />
+            <p class="disclaimer">
+              Нажимая на кнопку «Оплатить», вы соглашаетесь с
+              <a href="#" class="disclaimer__link">условиями оферты</a>
+            </p>
+          </div>
+        </div>
+        <PaymentFooter :order-number="orderStore.orderData?.orderId" />
       </div>
-    </FormCard>
+    </div>
   </PageContainer>
 </template>
 
 <style lang="scss" scoped>
+.order-payment-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  width: 100%;
+}
+
+.order-payment-page__main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.payment-layout {
+  width: 100%;
+  max-width: 20rem;
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  @media (min-width: 640px) {
+    max-width: 28rem;
+  }
+
+  @media (min-width: 1024px) {
+    max-width: 32rem;
+  }
+
+  @media (max-width: 480px) {
+    max-width: 100%;
+  }
+}
+
+.payment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
 .form-row {
   display: flex;
   gap: 1rem;
@@ -39,6 +184,66 @@ import CvvInput from '../components/inputs/CvvInput.vue';
   .input-wrapper {
     margin-bottom: 16px;
   }
+}
+
+.save-card-row {
+  width: 100%;
+  margin-top: 1.75rem;
+  padding-top: 0.75rem;
+
+  @media (max-width: 374px) {
+    margin-top: 1.5rem;
+    padding-top: 0.5rem;
+  }
+
+  @media (min-width: 640px) {
+    margin-top: 2rem;
+    padding-top: 1rem;
+  }
+}
+
+.pay-section {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.75rem;
+  margin-top: 1.75rem;
+  width: 100%;
+
+  :deep(.submit-button) {
+    width: 100%;
+  }
+
+  @media (max-width: 374px) {
+    margin-top: 1.5rem;
+    gap: 0.5rem;
+  }
+
+  @media (min-width: 640px) {
+    margin-top: 2rem;
+    gap: 1rem;
+  }
+}
+
+.disclaimer {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.4;
+  color: #a6a6a6;
+  text-align: center;
+
+  @media (min-width: 640px) {
+    font-size: 12px;
+  }
+
+  @media (min-width: 1024px) {
+    font-size: 13px;
+  }
+}
+
+.disclaimer__link {
+  color: inherit;
+  text-decoration: underline;
 }
 
 @media (max-width: 360px) {

@@ -29,9 +29,16 @@ defineProps<{
 .center__inner {
   width: 100%;
   max-width: 100%;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
+
+  .center.full-viewport & {
+    flex: 1;
+    min-height: 0;
+    align-self: stretch;
+  }
 
   @media (min-width: 640px) {
     padding: 0 0.5rem;
