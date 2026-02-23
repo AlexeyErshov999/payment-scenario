@@ -3,7 +3,7 @@
     <div class="payment-footer__content">
       <PaymentSystemsLogos />
       <p class="payment-footer__security">
-        <LockIcon class="payment-footer__lock" />
+        <img src="@/assets/icons/lock.svg" class="payment-footer__lock" />
         <span>Данные банковской карты будут переданы в зашифрованном виде</span>
       </p>
       <p v-if="orderNumber" class="payment-footer__order">
@@ -15,7 +15,6 @@
 
 <script setup lang="ts">
 import PaymentSystemsLogos from './PaymentSystemsLogos.vue'
-import LockIcon from '../base/icons/LockIcon.vue'
 
 defineProps<{
   orderNumber?: string

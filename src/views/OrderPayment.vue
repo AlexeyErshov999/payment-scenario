@@ -5,14 +5,16 @@ import PageContainer from '../components/base/PageContainer.vue'
 import FormCard from '../components/base/FormCard.vue'
 import ExpireDateInput from '../components/inputs/ExpireDateInput.vue'
 import CvvInput from '../components/inputs/CvvInput.vue'
-import Checkbox from '../components/base/Checkbox.vue'
+import FormCheckbox from '../components/base/FormCheckbox.vue'
 import FormText from '../components/base/FormText.vue'
 import SubmitButton from '../components/base/SubmitButton.vue'
 import PaymentFooter from '../components/payment/PaymentFooter.vue'
 import { useOrderStore } from '../stores/orderStore'
 import { useValidationErrorsStore } from '../stores/validationErrorsStore'
 import { formatNumberAsPrice } from '../utils/format/price'
-import { useCardDataStore } from '../stores/cardDataStore'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 const saveCard = ref(false)
 const isSubmitting = ref(false)
@@ -21,7 +23,6 @@ const cardDate = ref('')
 const cvv = ref('')
 const orderStore = useOrderStore()
 const validationStore = useValidationErrorsStore()
-const cardDataStore = useCardDataStore()
 
 const isFormFilled = computed(() => {
   const cn = (cardNumber.value || '').replace(/\s/g, '')
@@ -30,13 +31,13 @@ const isFormFilled = computed(() => {
 })
 
 const fillForm = () => {
+  const cardData = localStorage.getItem('cardData')
   if (
-    cardDataStore.cardData?.cardNum &&
-    cardDataStore.cardData.expired.month &&
-    cardDataStore.cardData.expired.year
+    cardData
   ) {
-    cardNumber.value = cardDataStore.cardData?.cardNum
-    cardDate.value = `${cardDataStore.cardData.expired.month} / ${cardDataStore.cardData.expired.year}`
+    const parsedData = JSON.parse(cardData)
+    cardNumber.value = parsedData.cardNumber
+    cardDate.value = `${parsedData.expired.month} / ${parsedData.expired.year}`
   } else {
     return
   }
@@ -65,8 +66,21 @@ const canPay = computed(
 const handlePay = async () => {
   if (!canPay.value) return
   isSubmitting.value = true
+
+  const month = cardDate.value.substring(0, 2)
+  const year = cardDate.value.substring(2, 4)
   try {
     // TODO: подумать про оплату
+    if (saveCard.value) {
+      localStorage.setItem('cardData', JSON.stringify({
+      cardNumber: cardNumber.value,
+      expired: {
+        month,
+        year
+      }
+    }))
+    }
+    await router.push('/payment-result')
   } finally {
     isSubmitting.value = false
   }
@@ -101,9 +115,9 @@ const handlePay = async () => {
             </div>
           </FormCard>
           <div class="save-card-row">
-            <Checkbox v-model="saveCard">
+            <FormCheckbox v-model="saveCard">
               <FormText>Сохранить карту для следующих покупок</FormText>
-            </Checkbox>
+            </FormCheckbox>
           </div>
           <div class="pay-section">
             <SubmitButton
