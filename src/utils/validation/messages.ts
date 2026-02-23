@@ -35,3 +35,9 @@ export const VALIDATION_MESSAGES = {
   CVV_REQUIRED: 'Обязательное поле',
   CVV_MIN: 'Минимум 3 цифры',
 } as const
+
+export const PAYMENT_RESULT_MESSAGES = {
+  SUCCESS: 'Успешная оплата!',
+  FAILED: 'Не удалось оплатить',
+  SERVICE_ERROR: 'Упс! Все сломалось... Попробуйте позже'
+} as const

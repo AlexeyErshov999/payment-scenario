@@ -9,10 +9,14 @@ export interface OrderData {
   createdAt?: string
 }
 
+export type PaymentStatus = 'success' | 'failed' | 'service_error';
+
 export const useOrderStore = defineStore('order', () => {
   const orderData = ref<OrderData | null>(null)
   const loading = ref<boolean>(false)
   const error = ref<string | null>(null)
+
+  const paymentStatus = ref<string>('success')
 
   const hasOrderData = computed<boolean>(() => !!orderData.value)
 
@@ -39,6 +43,14 @@ export const useOrderStore = defineStore('order', () => {
     } catch (e) {
       console.error('Failed to save order data to localStorage', e)
     }
+  }
+
+  function setPaymentStatus(status: PaymentStatus) {
+    paymentStatus.value = status
+  }
+
+  function getPaymentStatus() {
+    return paymentStatus.value
   }
 
   function clearOrderData(): void {
@@ -68,6 +80,8 @@ export const useOrderStore = defineStore('order', () => {
     orderSummary,
 
     setOrderData,
+    setPaymentStatus,
+    getPaymentStatus,
     clearOrderData,
     loadOrderDataFromStorage
   }
