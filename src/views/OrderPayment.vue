@@ -80,6 +80,7 @@ const handlePay = async () => {
       }
     }))
     }
+    orderStore.setPaymentStatus('success')
     await router.push('/payment-result')
   } finally {
     isSubmitting.value = false
