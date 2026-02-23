@@ -75,11 +75,6 @@ const handleLabelClick = (event: MouseEvent) => {
   white-space: nowrap;
   border: 0;
   overflow-anchor: none;
-
-  &:focus-visible + .checkbox__box {
-    outline: 2px solid $accent-color;
-    outline-offset: 2px;
-  }
 }
 
 .checkbox__box {
@@ -93,6 +88,10 @@ const handleLabelClick = (event: MouseEvent) => {
   border-radius: 4px;
   background-color: $white;
   transition: border-color 0.2s, background-color 0.2s;
+
+  &:hover {
+    border-color: $gray-dark;
+  }
 
   .checkbox__input:checked + & {
     background-color: $accent-color;
