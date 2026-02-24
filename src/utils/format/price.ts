@@ -8,8 +8,9 @@ interface ParsePriceOptions {
 }
 
 /**
- * Форматирует цену с разделителями тысяч и валютой (только целые числа)
- * @param value - сырое значение (только цифры)
+ * Форматирует цену с разделителями тысяч и опциональной валютой
+ * Поддерживает копейки, разделённые запятой или точкой
+ * @param value - сырое значение
  * @param options - опции форматирования
  * @returns отформатированная строка
  */
@@ -18,22 +19,39 @@ export const formatPrice = (value: string, options: FormatPriceOptions = {}): st
     showCurrency = false,
     currency = '₽'
   } = options
+
   if (!value) return ''
-  const cleaned = value.replace(/\D/g, '')
-  if (!cleaned) return ''
-  const integer = cleaned.replace(/^0+/, '') || '0'
+
+  const stringValue = value.toString().replace(/\s/g, '').replace('.', ',')
+  const [integerPartRaw, decimalPartRaw = ''] = stringValue.split(',')
+
+  const cleanedInteger = integerPartRaw.replace(/\D/g, '')
+  if (!cleanedInteger) return ''
+
+  const integer = cleanedInteger.replace(/^0+/, '') || '0'
   const formattedInteger = integer.replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
-  if (showCurrency) {
-    return currency + ' ' + formattedInteger
+
+  let result = formattedInteger
+
+  const cleanedDecimal = decimalPartRaw.replace(/\D/g, '').slice(0, 2)
+  if (cleanedDecimal) {
+    const decimal = cleanedDecimal.padEnd(2, '0')
+    result += `,${decimal}`
   }
-  return formattedInteger
+
+  if (showCurrency) {
+    return `${result} ${currency}`
+  }
+
+  return result
 }
 
 /**
- * Парсит отформатированную цену обратно в сырое значение (только цифры)
+ * Парсит отформатированную цену обратно в сырое значение
+ * Возвращает строку с целой частью и, при наличии, копейками через запятую
  * @param value - отформатированная строка с ценой
  * @param options - опции парсинга
- * @returns сырое значение (только цифры)
+ * @returns сырое значение
  */
 export const parsePrice = (value: string, options: ParsePriceOptions = {}): string => {
   const {
@@ -42,28 +60,45 @@ export const parsePrice = (value: string, options: ParsePriceOptions = {}): stri
   if (!value) return ''
   let cleaned = value.replace(currency, '').trim()
   cleaned = cleaned.replace(/\s/g, '')
-  cleaned = cleaned.replace(/\D/g, '')
-  return cleaned
+  cleaned = cleaned.replace('.', ',')
+
+  // Оставляем только цифры и запятую
+  cleaned = cleaned.replace(/[^0-9,]/g, '')
+
+  if (!cleaned) return ''
+
+  const parts = cleaned.split(',')
+  const integerPartRaw = parts[0] || '0'
+  const integer = integerPartRaw.replace(/^0+/, '') || '0'
+
+  let decimalPart = ''
+  if (parts.length > 1) {
+    decimalPart = parts[1].replace(/\D/g, '').slice(0, 2)
+  }
+
+  return decimalPart ? `${integer},${decimalPart}` : integer
 }
 
 /**
- * Форматирует число в цену (только целые числа)
- * @param number - целое число
+ * Форматирует число в цену
+ * @param number - число
  * @param options - опции форматирования
  * @returns отформатированная строка
  */
 export const formatNumberAsPrice = (number: number, options: FormatPriceOptions = {}): string => {
-  const integer = Math.round(number)
-  return formatPrice(integer.toString(), options)
+  return formatPrice(number.toString(), options)
 }
 
 /**
- * Парсит цену в число (только целые числа)
+ * Парсит цену в число
  * @param value - отформатированная строка с ценой
  * @param options - опции парсинга
- * @returns целое число или NaN
+ * @returns число или NaN
  */
 export const parsePriceToNumber = (value: string, options: ParsePriceOptions = {}): number => {
   const parsed = parsePrice(value, options)
-  return parsed ? parseInt(parsed, 10) : NaN
+  if (!parsed) return NaN
+  const normalized = parsed.replace(',', '.')
+  const num = parseFloat(normalized)
+  return Number.isFinite(num) ? num : NaN
 }

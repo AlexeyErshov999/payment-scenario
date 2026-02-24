@@ -6,7 +6,7 @@ import {
   isValidEmail,
 } from './validators'
 import { VALIDATION_MESSAGES } from './messages'
-import { formatPrice, parsePrice } from '../format/price'
+import { formatPrice, parsePrice, parsePriceToNumber } from '../format/price'
 import { parseExpireDate } from '../format/expireDate'
 
 type ValidationRule = (value: string) => string | boolean
@@ -26,14 +26,7 @@ export const createPriceRules = (
 ]
 
 /** Правила для поля суммы в форме заказа */
-export const amountRules: ValidationRule[] = [
-  (value: string) => {
-    if (!value) return VALIDATION_MESSAGES.AMOUNT_REQUIRED
-    if (isNaN(Number(value))) return VALIDATION_MESSAGES.AMOUNT_INTEGER
-    if (Number(value) <= 0) return VALIDATION_MESSAGES.AMOUNT_POSITIVE
-    return true
-  },
-]
+export const amountRules: ValidationRule[] = createPriceRules(1, 1_000_000, true)
 
 export const emailRules: ValidationRule[] = [
   (value: string) => {
@@ -47,7 +40,7 @@ export const descriptionRules: ValidationRule[] = [
   (value: string) => {
     if (!value) return VALIDATION_MESSAGES.DESCRIPTION_REQUIRED
     if (value.length < 10) return VALIDATION_MESSAGES.DESCRIPTION_MIN
-    if (value.length > 500) return VALIDATION_MESSAGES.DESCRIPTION_MAX
+    if (value.length > 200) return VALIDATION_MESSAGES.DESCRIPTION_MAX
     return true
   },
 ]
@@ -98,8 +91,7 @@ export const validateOrderFormData = (
     return { valid: false, errors }
   }
 
-  const cleanedAmount = data.amount.replace(/\s/g, '').replace(',', '.')
-  const amount = parseFloat(cleanedAmount)
+  const amount = parsePriceToNumber(data.amount)
 
   return {
     valid: true,

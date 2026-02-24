@@ -10,11 +10,12 @@ export const VALIDATION_MESSAGES = {
 
   // Сумма
   AMOUNT_REQUIRED: 'Введите сумму',
-  AMOUNT_INTEGER: 'Введите целое число',
+  AMOUNT_INTEGER: 'Введите корректную сумму',
   AMOUNT_POSITIVE: 'Сумма должна быть больше 0',
   AMOUNT_NOT_NEGATIVE: 'Сумма не может быть отрицательной',
   AMOUNT_MIN: (min: string) => `Сумма должна быть не менее ${min}`,
   AMOUNT_MAX: (max: string) => `Сумма должна быть не более ${max}`,
+  AMOUNT_RANGE: (min: string, max: string) => `Сумма должна быть от ${min} до ${max}₽`,
 
   // Email
   EMAIL_REQUIRED: 'Email обязателен',
@@ -23,7 +24,7 @@ export const VALIDATION_MESSAGES = {
   // Описание
   DESCRIPTION_REQUIRED: 'Описание обязательно',
   DESCRIPTION_MIN: 'Описание должно быть не менее 10 символов',
-  DESCRIPTION_MAX: 'Описание должно быть не более 500 символов',
+  DESCRIPTION_MAX: 'Описание должно быть не более 200 символов',
 
   // Срок действия карты
   EXPIRE_REQUIRED: 'Обязательное поле',

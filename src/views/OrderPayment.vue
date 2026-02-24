@@ -97,7 +97,7 @@ const handlePay = async () => {
         <div class="payment-layout">
           <FormCard :has-shadow="true">
             <template #logo>
-              <img class="card__logo-placeholder" src="../assets/icons/bank_logo.svg" alt="" />
+              <img class="card__logo-placeholder" src="../assets/icons/bank_logo.svg" alt="Bank logo" />
             </template>
             <div class="payment-form">
               <CardNumberInput
@@ -275,8 +275,8 @@ const handlePay = async () => {
 .card__logo-placeholder {
   width: 100%;
   height: 100%;
-  min-width: 48px;
-  min-height: 48px;
-  object-fit: contain;
+  min-width: 55px;
+  min-height: 47px;
+  object-fit: cover;
 }
 </style>

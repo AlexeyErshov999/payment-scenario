@@ -67,8 +67,8 @@ defineProps<{
     position: absolute;
     top: 0;
     right: 0;
-    width: 48px;
-    height: 48px;
+    width: 40px;
+    height: 40px;
   }
 }
 </style>

@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
+import helpIcon from '../../assets/icons/help.svg'
+import helpActiveIcon from '../../assets/icons/help_active.svg'
 
 defineProps<{
   text: string
@@ -38,20 +40,11 @@ onUnmounted(() => {
       :aria-expanded="isOpen"
       @click.stop="toggle"
     >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="12"
-        height="12"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-      >
-        <circle cx="12" cy="12" r="10" />
-        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
-        <line x1="12" y1="17" x2="12.01" y2="17" />
-      </svg>
+      <img
+        :src="isOpen ? helpActiveIcon : helpIcon"
+        alt=""
+        class="help-tooltip__icon"
+      />
     </button>
     <Transition name="tooltip">
       <div v-show="isOpen" class="help-tooltip__bubble" role="tooltip">
@@ -81,23 +74,20 @@ onUnmounted(() => {
   padding: 0;
   border: none;
   border-radius: 50%;
-  background: #A6A6A6;
+  background-color: $gray-light;
   color: $white;
   cursor: pointer;
-  transition: background-color 0.2s, color 0.2s;
-
-  &:hover {
-    background: darken($gray-light, 5%);
-    color: $gray-dark;
-  }
 
   &--active {
     background: $gray-medium;
     color: $white;
   }
 
-  svg {
+  .help-tooltip__icon {
     flex-shrink: 0;
+    width: 12px;
+    height: 12px;
+    display: block;
   }
 }
 

@@ -21,6 +21,7 @@
         @input="autoResize"
         @blur="validateField"
         ref="textareaRef"
+        v-bind="$attrs"
       ></textarea>
 
       <input

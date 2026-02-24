@@ -42,7 +42,7 @@ type PriceFormatter = (value: string) => string
 /**
  * Валидация суммы в поле ввода цены
  * @param value — сырое значение из поля
- * @param parsePrice — функция парсинга в цифры
+ * @param parsePrice — функция парсинга значения
  * @param formatPrice — функция форматирования для сообщений
  * @param min — минимальная сумма (включительно)
  * @param max — максимальная сумма (включительно)
@@ -55,22 +55,26 @@ export const validatePrice = (
   max: number
 ): string | boolean => {
   const parsed = parsePrice(value)
-  if (!parsed || !/^\d+$/.test(parsed)) {
+  if (!parsed) {
     return VALIDATION_MESSAGES.AMOUNT_INTEGER
   }
-  const num = Number(parsed)
-  if (!Number.isInteger(num)) {
+
+  const normalized = parsed.replace(',', '.')
+  const num = Number(normalized)
+
+  if (!Number.isFinite(num)) {
     return VALIDATION_MESSAGES.AMOUNT_INTEGER
   }
   if (num < 0) {
     return VALIDATION_MESSAGES.AMOUNT_NOT_NEGATIVE
   }
-  if (num < min) {
-    return VALIDATION_MESSAGES.AMOUNT_MIN(formatPrice(min.toString()))
+
+  if (num < min || num > max) {
+    const minFormatted = formatPrice(min.toString())
+    const maxFormatted = formatPrice(max.toString())
+    return VALIDATION_MESSAGES.AMOUNT_RANGE(minFormatted, maxFormatted)
   }
-  if (num > max) {
-    return VALIDATION_MESSAGES.AMOUNT_MAX(formatPrice(max.toString()))
-  }
+
   return true
 }
 

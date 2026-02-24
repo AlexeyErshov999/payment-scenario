@@ -99,6 +99,8 @@ const submitForm = async () => {
           label="Введите сумму заказа"
           placeholder="0"
           icon="₽"
+          :min="1"
+          :max="1000000"
         />
 
         <FormInput
@@ -118,6 +120,7 @@ const submitForm = async () => {
           placeholder="Что-то о заказе"
           :max-lines="3"
           :rules="descriptionRules"
+          maxlength="200"
         />
 
         <SubmitButton
