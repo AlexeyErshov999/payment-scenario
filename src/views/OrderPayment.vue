@@ -13,6 +13,7 @@ import { useValidationErrorsStore } from '../stores/validationErrorsStore'
 import { formatNumberAsPrice } from '../utils/format/price'
 import { useRouter } from 'vue-router'
 import { useCardDataStore } from '../stores/cardDataStore'
+import { getRandomPaymentStatus } from '../utils/payment/paymentStatus'
 
 const cardDataStore = useCardDataStore()
 
@@ -68,7 +69,6 @@ const handlePay = async () => {
   cardDataStore.loading = true
 
   try {
-    // TODO: подумать про оплату
     if (saveCard.value) {
       localStorage.setItem(
         'cardData',
@@ -77,7 +77,8 @@ const handlePay = async () => {
         }),
       )
     }
-    orderStore.setPaymentStatus('success')
+    const status = getRandomPaymentStatus()
+    orderStore.setPaymentStatus(status)
     orderStore.setPaymentPassed(true)
     // Имитирую задержку сети, чтобы на кнопке появился лоадер
     await new Promise((resolve) => setTimeout(resolve, 2000))
