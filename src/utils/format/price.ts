@@ -24,6 +24,7 @@ export const formatPrice = (value: string, options: FormatPriceOptions = {}): st
 
   const stringValue = value.toString().replace(/\s/g, '').replace('.', ',')
   const [integerPartRaw, decimalPartRaw = ''] = stringValue.split(',')
+  const hasTrailingComma = stringValue.endsWith(',')
 
   const cleanedInteger = integerPartRaw.replace(/\D/g, '')
   if (!cleanedInteger) return ''
@@ -34,13 +35,14 @@ export const formatPrice = (value: string, options: FormatPriceOptions = {}): st
   let result = formattedInteger
 
   const cleanedDecimal = decimalPartRaw.replace(/\D/g, '').slice(0, 2)
-  if (cleanedDecimal) {
-    const decimal = cleanedDecimal.padEnd(2, '0')
-    result += `,${decimal}`
+  if (hasTrailingComma && !cleanedDecimal) {
+    result += ','
+  } else if (cleanedDecimal) {
+    result += `,${cleanedDecimal}`
   }
 
   if (showCurrency) {
-    return `${result} ${currency}`
+    return `${currency} ${result}`
   }
 
   return result
@@ -74,6 +76,10 @@ export const parsePrice = (value: string, options: ParsePriceOptions = {}): stri
   let decimalPart = ''
   if (parts.length > 1) {
     decimalPart = parts[1].replace(/\D/g, '').slice(0, 2)
+  }
+
+  if (parts.length > 1 && cleaned.endsWith(',') && !decimalPart) {
+    return `${integer},`
   }
 
   return decimalPart ? `${integer},${decimalPart}` : integer
