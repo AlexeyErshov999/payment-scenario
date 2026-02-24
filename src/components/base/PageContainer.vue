@@ -19,12 +19,14 @@ defineProps<{
   justify-content: center;
   align-items: center;
   box-sizing: border-box;
-  block-size: 100vh;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 1rem;
 }
 
 .center__inner {
   width: 100%;
-  max-width: 100%;
+  max-width: 32rem;
   min-height: 0;
   display: flex;
   flex-direction: column;
