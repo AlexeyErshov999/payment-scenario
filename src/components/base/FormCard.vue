@@ -65,10 +65,24 @@ defineProps<{
 
   &__logo {
     position: absolute;
-    top: 0;
-    right: 0;
-    width: 40px;
-    height: 40px;
+    top: 0.75rem;
+    right: 0.75rem;
+    width: 56px;
+    height: 56px;
+
+    @media (max-width: 640px) {
+      top: 0.5rem;
+      right: 0.5rem;
+      width: 48px;
+      height: 48px;
+    }
+
+    @media (max-width: 375px) {
+      top: 0.4rem;
+      right: 0.4rem;
+      width: 42px;
+      height: 42px;
+    }
   }
 }
 </style>

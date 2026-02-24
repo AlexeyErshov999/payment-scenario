@@ -296,8 +296,8 @@ const handlePay = async () => {
 .card__logo-placeholder {
   width: 100%;
   height: 100%;
-  min-width: 55px;
-  min-height: 47px;
-  object-fit: cover;
+  min-width: 0;
+  min-height: 0;
+  object-fit: contain;
 }
 </style>
