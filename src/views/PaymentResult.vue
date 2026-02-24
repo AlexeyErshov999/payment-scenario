@@ -75,6 +75,11 @@ const resultImage = computed(() => {
   text-align: center;
 }
 
+.payment-result-content img {
+  display: block;
+  margin: 0 auto 1.75rem;
+}
+
 .result__text {
   font-size: 24px;
   line-height: 32px;

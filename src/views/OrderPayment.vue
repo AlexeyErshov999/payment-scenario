@@ -149,6 +149,7 @@ const handlePay = async () => {
 </template>
 
 <style lang="scss" scoped>
+@import '@/styles/variables/index.scss';
 .order-payment-root {
   min-height: 100vh;
   display: flex;
@@ -245,13 +246,16 @@ const handlePay = async () => {
 .pay-section {
   display: flex;
   flex-direction: column;
-  align-items: stretch;
+  align-items: center;
   gap: 0.75rem;
   margin-top: 1.75rem;
   width: 100%;
 
   :deep(.submit-button) {
     width: 100%;
+    max-width: 295px;
+    height: 56px;
+    font-size: 18px;
   }
 
   @media (max-width: 374px) {
@@ -263,14 +267,23 @@ const handlePay = async () => {
     margin-top: 2rem;
     gap: 1rem;
   }
+
+  @media (min-width: 1024px) {
+    :deep(.submit-button) {
+      width: 295px;
+      height: 64px;
+    }
+  }
 }
 
 .disclaimer {
   margin: 0;
   font-size: 11px;
   line-height: 1.4;
-  color: #a6a6a6;
+  color: $gray-medium;
   text-align: center;
+  max-width: 240px;
+  margin-inline: auto;
 
   @media (min-width: 640px) {
     font-size: 12px;
@@ -296,8 +309,8 @@ const handlePay = async () => {
 .card__logo-placeholder {
   width: 100%;
   height: 100%;
-  min-width: 55px;
-  min-height: 47px;
-  object-fit: cover;
+  min-width: 0;
+  min-height: 0;
+  object-fit: contain;
 }
 </style>

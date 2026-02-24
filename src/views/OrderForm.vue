@@ -123,13 +123,15 @@ const submitForm = async () => {
           maxlength="200"
         />
 
-        <SubmitButton
-          text="Создать"
-          type="submit"
-          :disabled="isSubmitting"
-          :has-form-errors="validationStore.hasErrors"
-          :loading="orderStore.loading"
-        />
+        <div class="form-actions">
+          <SubmitButton
+            text="Создать"
+            type="submit"
+            :disabled="isSubmitting"
+            :has-form-errors="validationStore.hasErrors"
+            :loading="orderStore.loading"
+          />
+        </div>
       </form>
     </FormCard>
   </PageContainer>
@@ -137,6 +139,7 @@ const submitForm = async () => {
 </template>
 
 <style lang="scss" scoped>
+@import '@/styles/variables/index.scss';
 .form {
   display: flex;
   flex-direction: column;
@@ -162,11 +165,32 @@ const submitForm = async () => {
   }
 }
 
+.form-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 0.5rem;
+  width: 100%;
+
+  :deep(.submit-button) {
+    width: 100%;
+    max-width: 295px;
+    height: 56px;
+    font-size: 18px;
+  }
+
+  @media (min-width: 1024px) {
+    :deep(.submit-button) {
+      width: 295px;
+      height: 64px;
+    }
+  }
+}
+
 .error-message {
-  color: #ff4444;
+  color: $error-strong;
   font-size: 13px;
   padding: 8px;
-  background-color: rgba(255, 68, 68, 0.1);
   border-radius: 4px;
   text-align: center;
 
@@ -178,15 +202,15 @@ const submitForm = async () => {
 
 .reset-btn {
   background: none;
-  border: 1px solid #ccc;
-  color: #666;
+  border: 1px solid $gray-border-muted;
+  color: $gray-text-muted;
   padding: 8px;
   border-radius: 4px;
   cursor: pointer;
   font-size: 14px;
 
   &:hover {
-    background-color: #f5f5f5;
+    background-color: $gray-soft;
   }
 
   @media (max-width: 374px) {
@@ -199,7 +223,7 @@ const submitForm = async () => {
 .debug-errors {
   margin-top: 20px;
   padding: 10px;
-  background-color: #f8f9fa;
+  background-color: $gray-softer;
   border-radius: 4px;
   font-size: 12px;
 
@@ -216,7 +240,7 @@ const submitForm = async () => {
 }
 
 .debug-errors {
-  background-color: #fff3f3;
-  color: #c00;
+  background-color: $error-soft;
+  color: $error-dark;
 }
 </style>
