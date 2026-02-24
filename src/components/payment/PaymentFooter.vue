@@ -25,6 +25,8 @@ defineProps<{
 @import '@/styles/variables/index.scss';
 
 .payment-footer {
+  width: 100%;
+  box-sizing: border-box;
   padding-top: 1.5rem;
   padding-bottom: 1rem;
   background-color: #f9f9f9;

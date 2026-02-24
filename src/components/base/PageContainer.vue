@@ -1,5 +1,5 @@
 <template>
-  <div class="center" :class="{ 'full-viewport': fullViewport }">
+  <div class="center">
     <div class="center__inner">
       <slot />
     </div>
@@ -18,12 +18,8 @@ defineProps<{
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 1rem;
   box-sizing: border-box;
-
-  &.full-viewport {
-    block-size: 100vh;
-  }
+  block-size: 100vh;
 }
 
 .center__inner {
@@ -33,9 +29,5 @@ defineProps<{
   display: flex;
   flex-direction: column;
   align-items: center;
-
-  @media (min-width: 640px) {
-    padding: 0 0.5rem;
-  }
 }
 </style>

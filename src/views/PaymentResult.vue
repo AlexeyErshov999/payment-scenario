@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import FormText from '../components/base/FormText.vue';
-import PageContainer from '../components/base/PageContainer.vue';
 import { useOrderStore } from '../stores/orderStore';
 import PaymentFooter from '../components/payment/PaymentFooter.vue';
 import { PAYMENT_RESULT_MESSAGES } from '../utils/validation/messages';
@@ -40,16 +39,42 @@ const resultImage = computed(() => {
 </script>
 
 <template>
-  <PageContainer full-viewport>
-    <img :src="resultImage" alt="Эмодзи, отражающий результат оплаты" />
-    <FormText class="result__text">
-      {{ resultText }}
-    </FormText>
+  <div class="payment-result-root">
+    <div class="payment-result-root__main">
+      <div class="payment-result-content">
+        <img :src="resultImage" alt="Эмодзи, отражающий результат оплаты" />
+        <FormText class="result__text">
+          {{ resultText }}
+        </FormText>
+      </div>
+    </div>
     <PaymentFooter :order-number="orderStore.orderData?.orderId" />
-  </PageContainer>
+  </div>
 </template>
 
 <style lang="scss" scoped>
+.payment-result-root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.payment-result-root__main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+.payment-result-content {
+  width: 100%;
+  max-width: 20rem;
+  margin-inline: auto;
+  text-align: center;
+}
+
 .result__text {
   font-size: 24px;
   line-height: 32px;

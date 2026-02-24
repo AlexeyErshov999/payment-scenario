@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import CardNumberInput from '../components/inputs/CardNumberInput.vue'
-import PageContainer from '../components/base/PageContainer.vue'
 import FormCard from '../components/base/FormCard.vue'
 import ExpireDateInput from '../components/inputs/ExpireDateInput.vue'
 import CvvInput from '../components/inputs/CvvInput.vue'
@@ -35,9 +34,7 @@ const isFormFilled = computed(() => {
 
 const fillForm = () => {
   const cardData = localStorage.getItem('cardData')
-  if (
-    cardData
-  ) {
+  if (cardData) {
     const parsedData = JSON.parse(cardData)
     cardNumber.value = parsedData.cardNumber
   } else {
@@ -70,18 +67,20 @@ const handlePay = async () => {
   isSubmitting.value = true
   cardDataStore.loading = true
 
-
   try {
     // TODO: подумать про оплату
     if (saveCard.value) {
-      localStorage.setItem('cardData', JSON.stringify({
-      cardNumber: cardNumber.value,
-    }))
+      localStorage.setItem(
+        'cardData',
+        JSON.stringify({
+          cardNumber: cardNumber.value,
+        }),
+      )
     }
     orderStore.setPaymentStatus('success')
     orderStore.setPaymentPassed(true)
     // Имитирую задержку сети, чтобы на кнопке появился лоадер
-    await new Promise(resolve => setTimeout(resolve, 2000))
+    await new Promise((resolve) => setTimeout(resolve, 2000))
     await router.push('/payment-result')
   } finally {
     isSubmitting.value = false
@@ -91,58 +90,79 @@ const handlePay = async () => {
 </script>
 
 <template>
-  <PageContainer full-viewport>
-    <div class="order-payment-page">
-      <div class="order-payment-page__main">
-        <div class="payment-layout">
-          <FormCard :has-shadow="true">
-            <template #logo>
-              <img class="card__logo-placeholder" src="../assets/icons/bank_logo.svg" alt="Bank logo" />
-            </template>
-            <div class="payment-form">
-              <CardNumberInput
-                v-model="cardNumber"
-                name="card-number"
-                label="Номер карты"
-                placeholder="1234 5678 9012 9999"
-              />
-              <div class="form-row">
-                <ExpireDateInput
-                  v-model="cardDate"
-                  name="card-date"
-                  label="Месяц / год"
-                  placeholder="12 / 24"
+  <div class="order-payment-root">
+    <div class="order-payment-root__main">
+      <div class="order-payment-page">
+        <div class="order-payment-page__main">
+          <div class="payment-layout">
+            <FormCard :has-shadow="true">
+              <template #logo>
+                <img
+                  class="card__logo-placeholder"
+                  src="../assets/icons/bank_logo.svg"
+                  alt="Bank logo"
                 />
-                <CvvInput v-model="cvv" name="cvv" placeholder="123" />
+              </template>
+              <div class="payment-form">
+                <CardNumberInput
+                  v-model="cardNumber"
+                  name="card-number"
+                  label="Номер карты"
+                  placeholder="1234 5678 9012 9999"
+                />
+                <div class="form-row">
+                  <ExpireDateInput
+                    v-model="cardDate"
+                    name="card-date"
+                    label="Месяц / год"
+                    placeholder="12 / 24"
+                  />
+                  <CvvInput v-model="cvv" name="cvv" placeholder="123" />
+                </div>
               </div>
+            </FormCard>
+            <div class="save-card-row">
+              <FormCheckbox v-model="saveCard">
+                <FormText>Сохранить карту для следующих покупок</FormText>
+              </FormCheckbox>
             </div>
-          </FormCard>
-          <div class="save-card-row">
-            <FormCheckbox v-model="saveCard">
-              <FormText>Сохранить карту для следующих покупок</FormText>
-            </FormCheckbox>
-          </div>
-          <div class="pay-section">
-            <SubmitButton
-              :text="isSubmitting ? 'Обработка...' : payButtonText"
-              :loading="cardDataStore.loading"
-              :disabled="!canPay"
-              :has-form-errors="validationStore.hasErrors"
-              @click="handlePay"
-            />
-            <p class="disclaimer">
-              Нажимая на кнопку «Оплатить», вы соглашаетесь с
-              <a href="#" class="disclaimer__link">условиями оферты</a>
-            </p>
+            <div class="pay-section">
+              <SubmitButton
+                :text="isSubmitting ? 'Обработка...' : payButtonText"
+                :loading="cardDataStore.loading"
+                :disabled="!canPay"
+                :has-form-errors="validationStore.hasErrors"
+                @click="handlePay"
+              />
+              <p class="disclaimer">
+                Нажимая на кнопку «Оплатить», вы соглашаетесь с
+                <a href="#" class="disclaimer__link">условиями оферты</a>
+              </p>
+            </div>
           </div>
         </div>
-        <PaymentFooter :order-number="orderStore.orderData?.orderId" />
       </div>
     </div>
-  </PageContainer>
+    <PaymentFooter :order-number="orderStore.orderData?.orderId" />
+  </div>
 </template>
 
 <style lang="scss" scoped>
+.order-payment-root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.order-payment-root__main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
 .order-payment-page {
   display: flex;
   flex-direction: column;
@@ -163,7 +183,7 @@ const handlePay = async () => {
   max-width: 20rem;
   margin-inline: auto;
   display: flex;
-  flex-direction: column;;
+  flex-direction: column;
   align-items: center;
 
   @media (min-width: 640px) {

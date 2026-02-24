@@ -90,7 +90,7 @@ const submitForm = async () => {
 </script>
 
 <template>
-  <PageContainer full-viewport>
+  <PageContainer>
     <FormCard :has-shadow="true" title="Создание заказа">
       <form @submit.prevent="submitForm" class="form">
         <PriceInput
@@ -133,6 +133,7 @@ const submitForm = async () => {
       </form>
     </FormCard>
   </PageContainer>
+  <PaymentFooter :order-number="orderStore.orderData?.orderId" />
 </template>
 
 <style lang="scss" scoped>
