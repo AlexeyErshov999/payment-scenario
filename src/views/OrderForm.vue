@@ -123,13 +123,15 @@ const submitForm = async () => {
           maxlength="200"
         />
 
-        <SubmitButton
-          text="Создать"
-          type="submit"
-          :disabled="isSubmitting"
-          :has-form-errors="validationStore.hasErrors"
-          :loading="orderStore.loading"
-        />
+        <div class="form-actions">
+          <SubmitButton
+            text="Создать"
+            type="submit"
+            :disabled="isSubmitting"
+            :has-form-errors="validationStore.hasErrors"
+            :loading="orderStore.loading"
+          />
+        </div>
       </form>
     </FormCard>
   </PageContainer>
@@ -160,6 +162,28 @@ const submitForm = async () => {
 
   @media (max-height: 500px) and (max-width: 640px) {
     gap: 8px;
+  }
+}
+
+.form-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 0.5rem;
+  width: 100%;
+
+  :deep(.submit-button) {
+    width: 100%;
+    max-width: 295px;
+    height: 56px;
+    font-size: 18px;
+  }
+
+  @media (min-width: 1024px) {
+    :deep(.submit-button) {
+      width: 295px;
+      height: 64px;
+    }
   }
 }
 
