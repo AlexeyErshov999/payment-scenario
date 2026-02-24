@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
+import { type PaymentStatus } from '../utils/payment/paymentStatus'
 
 export interface OrderData {
   amount: number | string
@@ -8,8 +9,6 @@ export interface OrderData {
   orderId?: string
   createdAt?: string
 }
-
-export type PaymentStatus = 'success' | 'failed' | 'service_error';
 
 export const useOrderStore = defineStore('order', () => {
   const orderData = ref<OrderData | null>(null)
