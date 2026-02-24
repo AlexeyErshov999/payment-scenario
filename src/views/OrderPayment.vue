@@ -149,6 +149,7 @@ const handlePay = async () => {
 </template>
 
 <style lang="scss" scoped>
+@import '@/styles/variables/index.scss';
 .order-payment-root {
   min-height: 100vh;
   display: flex;
@@ -269,7 +270,7 @@ const handlePay = async () => {
   margin: 0;
   font-size: 11px;
   line-height: 1.4;
-  color: #a6a6a6;
+  color: $gray-medium;
   text-align: center;
 
   @media (min-width: 640px) {

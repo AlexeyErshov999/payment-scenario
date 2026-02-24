@@ -29,8 +29,8 @@ defineProps<{
   box-sizing: border-box;
   padding-top: 1.5rem;
   padding-bottom: 1rem;
-  background-color: #f9f9f9;
-  border-top: 1px solid #eee;
+  background-color: $gray-page;
+  border-top: 1px solid $gray-border;
 }
 
 .payment-footer__content {
